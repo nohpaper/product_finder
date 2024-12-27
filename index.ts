@@ -136,13 +136,18 @@ const ventilation: Ventilation = {
         }
     ]
 }
+interface QuestionName {
+    key: string;
+    value: string;
+}
 interface QuestionType {
-    korean: string;
-    english: string;
+    korean: string | string[];
+    english: string | string[];
+    group?: boolean;
 }
 interface Question {
     id: number;
-    title: string;
+    title: QuestionName;
     isMultiple: boolean;
     types: QuestionType[];
 }
@@ -150,7 +155,7 @@ const question: Question[] = [
     {
         //선택 필수, id 표기 필수, 단일 선택
         id:1,
-        title: "주거형태를 선택해주세요.",
+        title: {key:"residence", value: "주거형태를 선택해주세요."},
         isMultiple:false,
         types: [
             {korean: "아파트", english: "apartment"},
@@ -162,7 +167,7 @@ const question: Question[] = [
     {
         //선택 필수, id 표기 필수, 단일 선택
         id:2,
-        title: "주거층수를 선택해주세요.",
+        title: {key:"floor", value: "주거층수를 선택해주세요."},
         isMultiple:false,
         types: [
             {korean: "저층(1~9F)", english: "lowRise" },
@@ -173,7 +178,7 @@ const question: Question[] = [
     {
         //선택 필수, id 표기 필수, 단일 선택
         id:3,
-        title: "주거평형을 선택해주세요. (※ 1평 = 3.3㎡)",
+        title: {key:"space", value: "주거평형을 선택해주세요. (※ 1평 = 3.3㎡)"},
         isMultiple:false,
         types: [
             {korean: "10평~22평대", english: "10-22"},
@@ -184,14 +189,12 @@ const question: Question[] = [
     {
         //선택 필수 X, id 표기 X, 다중 선택
         id:4,
-        title: "기타사항을 선택해주세요.",
+        title: {key:"etc", value: "기타사항을 선택해주세요."},
         isMultiple:true,
         types: [
-            {korean: "영유아", english: "toddler"},
-            {korean: "어르신", english: "elder"},
+            {korean: ["영유아", "어르신"], english: ["toddler", "elder"], group:true},
             {korean: "담배냄새유입", english: "cigarettes"},
-            {korean: "흡연자", english: "smoker"},
-            {korean: "반려동물", english: "pet"},
+            {korean: ["흡연자", "반려동물"], english: ["smoker", "pet"], group:true},
             {korean: "복합기능", english: "complex"}
         ]
     }
@@ -205,29 +208,101 @@ question.forEach((question: Question, questionIndex) => {
     
     if(question.id !== 4) {
         //id가 4가 아닐때
-        step.innerHTML = `<h3>${question.id}. ${question.title}</h3><div class="types"></div>`;
+        step.innerHTML = `<h3>${question.id}. ${question.title.value}</h3><div class="types"></div>`;
     }else {
-        step.innerHTML = `<h3>${question.title}</h3><div class="types"></div>`;
+        step.innerHTML = `<h3>${question.title.value}</h3><div class="types"></div>`;
     }
     wrap.appendChild(step);
     //h3(title)과 .types 태그까지 생성 끝
     
-    const types = document.querySelectorAll(".types");
+    const types:NodeListOf<Element> = document.querySelectorAll(".types");
     
     question.types.forEach((type: QuestionType, typeIndex) => {
+        const typeEnglish = type.english;
+        const typeKorean = type.korean;
         const typeItem:HTMLDivElement = document.createElement("div");
         typeItem.classList.add("item");
-        
+
+        const stringProperty = (type:string | string[]):string => {
+            return String(type).replace(",", "_");
+        }
+        const stringName = (type:string | string[]):string => {
+            return String(type).replace(",", "/")
+        }
+
         if(question.isMultiple){
             //다중 선택일 경우
-            typeItem.innerHTML = `<input type="checkbox" id="${type.english}" name="question${question.id}"/><label for="${type.english}">${type.korean}</label>`
+            if(type.group){
+                //group true인 경우
+                typeItem.innerHTML = `<input type="checkbox" id="${stringProperty(typeEnglish)}" name="${question.title.key}"/><label for="${stringProperty(typeEnglish)}">${stringName(typeKorean)}</label>`;
+            }else {
+                typeItem.innerHTML = `<input type="checkbox" id="${type.english}" name="${question.title.key}"/><label for="${type.english}">${typeKorean}</label>`;
+            }
         }else {
             //단일 선택일 경우
-            typeItem.innerHTML = `<input type="radio" id="${type.english}" name="question${question.id}"/><label for="${type.english}">${type.korean}</label>`
+            if(type.group){
+                //group true인 경우
+                typeItem.innerHTML = `<input type="radio" id="${stringProperty(typeEnglish)}" name="${question.title.key}"/><label for="${stringProperty(typeEnglish)}">${stringName(typeKorean)}</label>`;
+            }else {
+                typeItem.innerHTML = `<input type="radio" id="${type.english}" name="${question.title.key}"/><label for="${type.english}">${typeKorean}</label>`;
+            }
         }
         
-        
         types[questionIndex].appendChild(typeItem);
-        
     });
+
+});
+interface Selected {
+    residence?: string[];
+    floor?: string[];
+    space?: string[];
+    etc?: string[];
+}
+const findButton = document.getElementById("findButton") as HTMLElement;
+
+findButton.addEventListener("click", function(){
+    const inputChecked = document.querySelectorAll("input:checked") as NodeListOf<HTMLInputElement>; //선택된 input checked 가져오기
+    const selected:Selected = {//내가 선택한 값들을 저장하는 객체배열 변수
+        residence:[], floor:[], space:[], etc:[],
+    };
+    let result:Ventilation = ventilation;
+
+    inputChecked.forEach((input)=>{
+        if(input.id.search("_") !== -1 && !selected[input.name].includes(input.id)){
+            //input.id string에 _이 없으면 -1 반환
+
+            input.id.split("_").forEach((split)=>{
+                //_로 있는 것 분할하여 배열로 변환 및 forEach
+                selected[input.name].push(split); //배열의 값 push
+            });
+        }else {
+            //input.id string에 _이 있고, selected[input.name]에도 값이 없을 경우
+            selected[input.name].push(input.id);
+        }
+    });
+
+    Object.keys(selected).forEach((keys)=>{
+        selected[keys].forEach((item)=>{
+            console.log(result.vent.filter((result)=> result.residence === item))
+            result.vent = result.vent.filter((result)=> result.residence === item);
+        });
+    });
+    console.log(result);
+    result.vent.forEach((vent)=>{
+
+        //숫자만 반환
+        vent.floor = vent.floor.replace(/[^0-9]/g, "");
+
+        //반환받은 숫자 변경
+        if(Number(vent.floor) > 0 && Number(vent.floor) <= 9){
+            vent.floor = "lowRise";
+        }else if(Number(vent.floor) >= 10 && Number(vent.floor) <= 19){
+            vent.floor = "midRise";
+        }else if(Number(vent.floor) >= 20){
+            vent.floor = "highRise";
+        }else {
+            console.log("해당없음");
+        }
+        console.log(vent);
+    })
 });
