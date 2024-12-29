@@ -1,11 +1,12 @@
+interface VentilationInner {
+    id: number;
+    residence: string;
+    floor: string;
+    space: number | string;
+    etc: string[];
+}
 interface Ventilation {
-    vent: {
-        id: number;
-        residence: string;
-        floor: string;
-        space: number;
-        etc: string[];
-    }[];
+    vent: VentilationInner[];
 }
 const ventilation: Ventilation = {
     vent: [
@@ -252,12 +253,15 @@ question.forEach((question: Question, questionIndex) => {
     });
 
 });
+
+
 interface Selected {
     residence?: string[];
     floor?: string[];
     space?: string[];
     etc?: string[];
 }
+
 const findButton = document.getElementById("findButton") as HTMLElement;
 
 findButton.addEventListener("click", function(){
@@ -265,44 +269,79 @@ findButton.addEventListener("click", function(){
     const selected:Selected = {//내가 선택한 값들을 저장하는 객체배열 변수
         residence:[], floor:[], space:[], etc:[],
     };
-    let result:Ventilation = ventilation;
+    //깊은 복사를 해서 Ventilation와 result객체가 서로 독립적으로 동작할 수 있도록
+    const result:Ventilation = JSON.parse(JSON.stringify(ventilation));
 
-    inputChecked.forEach((input)=>{
-        if(input.id.search("_") !== -1 && !selected[input.name].includes(input.id)){
+    inputChecked.forEach((input:HTMLInputElement)=>{
+        const key = input.name as keyof Selected; //그냥 selected에 input.name을 박아버리면 tsc에서 string은 key값으로 참조할 수 없기때문에 불가, 라고 떠서 input.name은 Selected의 key값이라고 알려줘야함.
+
+        if(input.id.search("_") !== -1 && selected[key] && !selected[key]?.includes(input.id)){ //selected[key]는 undefined일수도 아닐수도
             //input.id string에 _이 없으면 -1 반환
 
             input.id.split("_").forEach((split)=>{
                 //_로 있는 것 분할하여 배열로 변환 및 forEach
-                selected[input.name].push(split); //배열의 값 push
+                selected[key]?.push(split); //배열의 값 push
             });
         }else {
             //input.id string에 _이 있고, selected[input.name]에도 값이 없을 경우
-            selected[input.name].push(input.id);
+            selected[key]?.push(input.id);
+        }
+    });
+    //selected에 값이 없으면 담기
+
+    //filter 시작
+    result.vent.forEach((vent:VentilationInner, index: number)=>{
+        //만약 vent 내부에 question[title[key]]를 키 값으로 돌려서 floor(string포함)거나 space(only number)면 변경
+        if(vent.floor){
+            //vent.floor이 string 포함이기 때문에..
+            //숫자만 반환
+            vent.floor = vent.floor.replace(/[^0-9]/g, "");
+            if(Number(vent.floor) > 0 && Number(vent.floor) <= 9){
+                vent.floor = "lowRise";
+            }else if(Number(vent.floor) >= 10 && Number(vent.floor) <= 19){
+                vent.floor = "midRise";
+            }else if(Number(vent.floor) >= 20){
+                vent.floor = "highRise";
+            }else {
+                console.log("해당없음");
+            }
+        }
+        if(vent.space){
+            //숫자만
+            if(Number(vent.space) > 0 && Number(vent.space) <= 22){
+                vent.space = "10-22";
+            }else if(Number(vent.space) >= 23 && Number(vent.space) <= 40){
+                vent.space = "30-40";
+            }else if(Number(vent.space) >= 41){
+                vent.space = "40plus";
+            }else {
+                console.log("해당없음");
+            }
+        }
+        if(vent.etc){
+            //console.log(vent.etc.every((etc, index)=>etc === selected.etc[index]));
+            //console.log(vent.etc.every((etc, index)=>etc === selected.etc[index]));
+            if(selected.etc){
+                //includes로 result 에서 하나라도 true나오면 반환
+                //result etc 내에 있는 배열 모두 있을 경우 true
+                console.log(vent.etc.every((etc, index)=>etc === selected.etc[index]));
+                console.log(vent.etc, selected.etc);
+            }
         }
     });
 
-    Object.keys(selected).forEach((keys)=>{
-        selected[keys].forEach((item)=>{
-            console.log(result.vent.filter((result)=> result.residence === item))
-            result.vent = result.vent.filter((result)=> result.residence === item);
+    Object.keys(selected).forEach((keys: string)=>{
+        const key = keys as keyof Selected;
+
+        selected[key]?.forEach((item: string)=>{
+            console.log(key, item);
+
+            if(key !== "etc"){
+                result.vent = result.vent.filter((result)=> result[key] === item);
+            }else{
+                console.log("아직이지롱");
+            }
         });
     });
-    console.log(result);
-    result.vent.forEach((vent)=>{
-
-        //숫자만 반환
-        vent.floor = vent.floor.replace(/[^0-9]/g, "");
-
-        //반환받은 숫자 변경
-        if(Number(vent.floor) > 0 && Number(vent.floor) <= 9){
-            vent.floor = "lowRise";
-        }else if(Number(vent.floor) >= 10 && Number(vent.floor) <= 19){
-            vent.floor = "midRise";
-        }else if(Number(vent.floor) >= 20){
-            vent.floor = "highRise";
-        }else {
-            console.log("해당없음");
-        }
-        console.log(vent);
-    })
+    console.log(result.vent[0]);
 });
