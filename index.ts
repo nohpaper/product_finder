@@ -128,7 +128,7 @@ const ventilation: Ventilation = {
         {
             id:24,
             residence : 'villa', floor : '3rd',
-            space: 30, etc : ['pet','elder']
+            space: 30, etc : ['pet','cigarettes']
         },
         {
             id:25,
@@ -256,10 +256,10 @@ question.forEach((question: Question, questionIndex) => {
 
 
 interface Selected {
-    residence?: string[];
-    floor?: string[];
-    space?: string[];
-    etc?: string[];
+    residence: string[];
+    floor: string[];
+    space: string[];
+    etc: string[];
 }
 
 const findButton = document.getElementById("findButton") as HTMLElement;
@@ -290,7 +290,7 @@ findButton.addEventListener("click", function(){
     //selected에 값이 없으면 담기
 
     //filter 시작
-    result.vent.forEach((vent:VentilationInner, index: number)=>{
+    result.vent.forEach((vent:VentilationInner)=>{
         //만약 vent 내부에 question[title[key]]를 키 값으로 돌려서 floor(string포함)거나 space(only number)면 변경
         if(vent.floor){
             //vent.floor이 string 포함이기 때문에..
@@ -318,30 +318,37 @@ findButton.addEventListener("click", function(){
                 console.log("해당없음");
             }
         }
-        if(vent.etc){
-            //console.log(vent.etc.every((etc, index)=>etc === selected.etc[index]));
-            //console.log(vent.etc.every((etc, index)=>etc === selected.etc[index]));
-            if(selected.etc){
-                //includes로 result 에서 하나라도 true나오면 반환
-                //result etc 내에 있는 배열 모두 있을 경우 true
-                console.log(vent.etc.every((etc, index)=>etc === selected.etc[index]));
-                console.log(vent.etc, selected.etc);
-            }
-        }
     });
 
     Object.keys(selected).forEach((keys: string)=>{
         const key = keys as keyof Selected;
 
         selected[key]?.forEach((item: string)=>{
-            console.log(key, item);
-
+            //console.log(keys, item);
             if(key !== "etc"){
-                result.vent = result.vent.filter((result)=> result[key] === item);
+                /*
+                * TODO:: 1. etc가 아닐 경우 상단의 floor와 space 처리를 여기서 진행할 수 있도록 작업 예정
+                * */
+                result.vent = result.vent.filter((vent:VentilationInner ): boolean => {
+                    
+                    return vent[key] === item;
+                });
             }else{
-                console.log("아직이지롱");
+                //includes로 result 에서 하나라도 true나오면 반환
+                result.vent = result.vent.filter((vent: VentilationInner): boolean=>{
+                    const etc = vent[key];
+
+                    if(etc.length === 0){
+                        //etc 배열의 length값이 0일 경우
+                        //result에 etc 빈 배열인 항목이 포함되지 않도록 처리해야함
+                        return vent !== vent;
+                    }else {
+                        //etc 배열의 length값이 0이 아닐 경우
+                        return etc.some((item: string): boolean=>selected.etc.includes(item));
+                    }
+                });
             }
         });
     });
-    console.log(result.vent[0]);
+    console.log(result.vent);
 });
