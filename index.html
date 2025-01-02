@@ -4,11 +4,33 @@
     <meta charset="UTF-8">
     <title>Title</title>
     <link rel="stylesheet" href="./main.css">
+    <style>
+        #question { padding-top:100px; }
+        #question .step h3 { font-size:24px; font-weight:bold; text-align:center; margin:50px 0 15px; }
+        #question .step h3 span { font-size:16px; color:red; }
+        #question .step .types { display:flex; justify-content:center; }
+        #question .step .types .item { height:43px; position:relative; }
+        #question .step .types .item:nth-of-type(n+2) { margin-left:5px; }
+        #question .step .types .item input { position:absolute; top:0; left:0; opacity:0; visibility:hidden; }
+        #question .step .types .item input ~ label { height:100%; display:flex; align-items: center; justify-content: center; padding:0 10px; border:1px solid gray; border-radius:15px; cursor:pointer; }
+        #question .step .types .item input:checked ~ label { color:#fff; background-color:#000; }
+        
+        .find_wrap { padding-top:40px; text-align:center; }
+        .find_wrap #findButton { padding:10px 30px; font-size:20px; cursor:pointer; }
+        
+        #result { display:flex; justify-content:center; flex-wrap:wrap; gap:20px; padding:30px; }
+        #result > div { min-width:300px; padding:20px; border:1px solid gray; border-radius:15px; }
+    </style>
 </head>
 <body>
     <div id="question">
     </div>
-    <button type="button" id="findButton">찾기</button>
+    <div class="find_wrap">
+        <button type="button" id="findButton">찾기</button>
+    </div>
+    <div id="result">
+    
+    </div>
 </body>
 <script src="./index.js"></script>
 </html>
