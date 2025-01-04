@@ -276,20 +276,30 @@ findButton.addEventListener("click", function(){
         const key = input.name as keyof Selected; //그냥 selected에 input.name을 박아버리면 tsc에서 string은 key값으로 참조할 수 없기때문에 불가, 라고 떠서 input.name은 Selected의 key값이라고 알려줘야함.
 
         if(input.id.search("_") !== -1 && selected[key] && !selected[key]?.includes(input.id)){ //selected[key]는 undefined일수도 아닐수도
-            //input.id string에 _이 없으면 -1 반환
-
+            //input.id string에 _이 있을 경우
             input.id.split("_").forEach((split)=>{
                 //_로 있는 것 분할하여 배열로 변환 및 forEach
                 selected[key]?.push(split); //배열의 값 push
             });
         }else {
-            //input.id string에 _이 있고, selected[input.name]에도 값이 없을 경우
+            //input.id string에 _이 없고, selected[input.name]에도 값이 없을 경우
             selected[key]?.push(input.id);
         }
     });
     //selected에 값이 없으면 담기
 
-    if(selected.residence.length > 0 && selected.floor.length > 0 && selected.space.length > 0){
+    //isEssential boolean값과 selected[key]의 length 값 비교
+    const essentialLength: number[] = [];
+    question.forEach((element)=>{
+        const key = element.title.key as keyof Selected;
+
+        if(element.isEssential){
+            //isEssential true랑 selected의 length값이랑 비교
+            essentialLength.push(selected[key].length);
+        }
+    });
+
+    if(essentialLength.every((boolean)=>boolean === 1)){
         //filter 시작
         result.vent.forEach((vent:VentilationInner)=>{
             //만약 vent 내부에 question[title[key]]를 키 값으로 돌려서 floor(string포함)거나 space(only number)면 변경
@@ -320,10 +330,10 @@ findButton.addEventListener("click", function(){
                 }
             }
         });
-        
+
         Object.keys(selected).forEach((keys: string)=>{
             const key = keys as keyof Selected;
-            
+
             selected[key]?.forEach((item: string)=>{
                 //console.log(keys, item);
                 if(key !== "etc"){
@@ -332,7 +342,7 @@ findButton.addEventListener("click", function(){
                     //includes로 result 에서 하나라도 true나오면 반환
                     result.vent = result.vent.filter((vent: VentilationInner): boolean=>{
                         const etc = vent[key];
-                        
+
                         if(etc.length === 0){
                             //etc 배열의 length값이 0일 경우
                             //result에 etc 빈 배열인 항목이 포함되지 않도록 처리해야함
@@ -345,17 +355,17 @@ findButton.addEventListener("click", function(){
                 }
             });
         });
-        
-        
+
+
         //값 뿌려주기
         const resultField = document.getElementById("result") as HTMLElement;
-        
+
         resultField.innerHTML = '';
-        
+
         if(result.vent.length > 0){
             result.vent.forEach((element)=>{
                 const resultText:HTMLDivElement = document.createElement("div");
-                
+
                 resultText.innerHTML = `<h6>vent${String(element.id).padStart(2, "0")}</h6>`;
                 resultField.appendChild(resultText);
             });
