@@ -5,29 +5,36 @@
     <title>Title</title>
     <link rel="stylesheet" href="./main.css">
     <style>
-        #question { padding-top:100px; }
-        #question .step h3 { font-size:24px; font-weight:bold; text-align:center; margin:50px 0 15px; }
-        #question .step h3 span { font-size:16px; color:red; }
-        #question .step .types { display:flex; justify-content:center; }
-        #question .step .types .item { height:43px; position:relative; }
-        #question .step .types .item:nth-of-type(n+2) { margin-left:5px; }
+        #wrap { width:100%; min-height:100vh; display:flex; flex-direction:column; align-items:center; background-image: linear-gradient(45deg, rgba(233,242,167,0.2), rgba(101,166,3,0.2));}
+        #question { width:100%; max-width:53.3vw; padding-top:2.5vw; }
+        #question .step h3 { font-size:1.04vw; font-weight:bold; margin:1.97vw 0 0.62vw; }
+        #question .step h3 span { color:red; }
+        #question .step .types { display:flex; }
+        #question .step .types .item { position:relative; }
+        #question .step .types .item:nth-of-type(n+2) { margin-left:0.26vw; }
         #question .step .types .item input { position:absolute; top:0; left:0; opacity:0; visibility:hidden; }
-        #question .step .types .item input ~ label { height:100%; display:flex; align-items: center; justify-content: center; padding:0 10px; border:1px solid gray; border-radius:15px; cursor:pointer; }
-        #question .step .types .item input:checked ~ label { color:#fff; background-color:#000; }
+        #question .step .types .item input ~ label { display:flex; align-items: center; justify-content: center; padding:0.62vw 1.56vw; color:#1B4001; border:1px solid #E9F2A7; border-radius:99px; box-sizing:border-box; font-size:0.72vw; cursor:pointer; box-shadow:0 4px 4px rgba(0,0,0,0.05); background-color:#ffffff; }
+        #question .step .types .item input:checked ~ label { color:#fff; border-color:#3B7302; background-color:#65A603; }
         
-        .find_wrap { padding-top:40px; text-align:center; }
-        .find_wrap #findButton { padding:10px 30px; font-size:20px; cursor:pointer; }
+        .find_wrap { width:100%; padding-top:3.75vw; text-align:center; }
+        .find_wrap #findButton { width:100%; max-width:53.3vw; display:inline-block; padding:0.62vw 0; border-radius:99px; font-size:0.72vw; cursor:pointer; background-color:#ffffff; outline: 0; border: 0; }
         
-        #result { display:flex; justify-content:center; flex-wrap:wrap; gap:20px; padding:30px; }
-        #result > div { min-width:300px; padding:20px; border:1px solid gray; border-radius:15px; }
+        #result { width:100%; max-width:53.3vw; padding:3.64vw; }
+        #result > div { min-width:233px; border-radius:10px; }
+        #result > div.type01 { background-color:#3B7302; }
+        #result > div.type02 { background-color:#9BBF65; }
+        #result > div.type03 { background-color:#65A603; }
+        #result > div.type04 { background-color:#F6FCC9; }
     </style>
 </head>
 <body>
-    <div id="question"></div>
-    <div class="find_wrap">
-        <button type="button" id="findButton">찾기</button>
+    <div id="wrap">
+        <div id="question"></div>
+        <div class="find_wrap">
+            <button type="button" id="findButton">클릭해서 결과 보기</button>
+        </div>
+        <div id="result"></div>
     </div>
-    <div id="result"></div>
 </body>
 <script src="./index.js"></script>
 </html>

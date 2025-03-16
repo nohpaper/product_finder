@@ -134,6 +134,16 @@ const ventilation: Ventilation = {
             id:25,
             residence : 'villa', floor : '1st',
             space: 8, etc : []
+        },
+        {
+            id:26,
+            residence : 'apartment', floor : '30th',
+            space: 39, etc : []
+        },
+        {
+            id:26,
+            residence : 'apartment', floor : '30th',
+            space: 39, etc : []
         }
     ]
 }
@@ -211,13 +221,8 @@ const wrap = document.getElementById("question") as HTMLElement;
 question.forEach((question: Question, questionIndex) => {
     const step:HTMLDivElement = document.createElement("div");//question 객체 갯수만큼 div 생성
     step.classList.add("step"); //생성된 div에 step class 추가
-    
-    if(question.id !== 4) {
-        //id가 4가 아닐때
-        step.innerHTML = `<h3>${question.id}. ${question.title.value}${question.isEssential ? "<span>* 필수</span>" : "<span>* 선택</span>"}</h3><div class="types"></div>`;
-    }else {
-        step.innerHTML = `<h3>${question.title.value}${question.isEssential ? "<span>* 필수</span>" : "<span>* 선택</span>"}</h3><div class="types"></div>`;
-    }
+
+    step.innerHTML = `<h3>${question.title.value}${question.isEssential ? "<span>*</span>" : "<span></span>"}</h3><div class="types"></div>`;
     wrap.appendChild(step);
     //h3(title)과 .types 태그까지 생성 끝
     
@@ -363,8 +368,21 @@ findButton.addEventListener("click", function(){
         resultField.innerHTML = '';
 
         if(result.vent.length > 0){
-            result.vent.forEach((element)=>{
+            result.vent.forEach((element, index)=>{
                 const resultText:HTMLDivElement = document.createElement("div");
+                let classNumber = index + 1;
+                console.log(classNumber);
+                if(classNumber % 5 === 0){
+                    resultText.classList.add(`type01`);
+                }else if(classNumber % 6 === 0){
+                    resultText.classList.add(`type02`);
+                }else if(classNumber % 7 === 0){
+                    resultText.classList.add(`type03`);
+                }else if(classNumber % 8 === 0){
+                    resultText.classList.add(`type04`);
+                } else {
+                    resultText.classList.add(`type${String(classNumber).padStart(2, "0")}`);
+                }
 
                 resultText.innerHTML = `<h6>vent${String(element.id).padStart(2, "0")}</h6>`;
                 resultField.appendChild(resultText);
