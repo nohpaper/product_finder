@@ -1,30 +1,56 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>나에게 맞는 제품 찾기</title>
     <link rel="stylesheet" href="./main.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css"/>
     <style>
         #wrap { width:100%; min-height:100vh; display:flex; flex-direction:column; align-items:center; background-image: linear-gradient(45deg, rgba(233,242,167,0.2), rgba(101,166,3,0.2));}
-        #question { width:100%; max-width:53.3vw; padding-top:2.5vw; }
-        #question .step h3 { font-size:1.04vw; font-weight:bold; margin:1.97vw 0 0.62vw; }
+        #question { width:100%; padding:4.69vw 0 0 4.88vw; overflow-x:hidden; box-sizing:border-box; }
+        #question .step h3 { font-size:1.95vw; font-weight:bold; margin:3.71vw 0 1.17vw; }
         #question .step h3 span { color:red; }
         #question .step .types { display:flex; }
         #question .step .types .item { position:relative; }
-        #question .step .types .item:nth-of-type(n+2) { margin-left:0.26vw; }
+        #question .step .types .item:nth-of-type(n+2) { margin-left:0.49vw; }
         #question .step .types .item input { position:absolute; top:0; left:0; opacity:0; visibility:hidden; }
-        #question .step .types .item input ~ label { display:flex; align-items: center; justify-content: center; padding:0.62vw 1.56vw; color:#1B4001; border:1px solid #E9F2A7; border-radius:99px; box-sizing:border-box; font-size:0.72vw; cursor:pointer; box-shadow:0 4px 4px rgba(0,0,0,0.05); background-color:#ffffff; }
+        #question .step .types .item input ~ label { display:flex; align-items: center; justify-content: center; padding:1.17vw 2.93vw; color:#1B4001; border:0.10vw solid #E9F2A7; border-radius:9.67vw; box-sizing:border-box; font-size:1.37vw; cursor:pointer; box-shadow:0 0.39vw 0.39vw rgba(0,0,0,0.05); background-color:#ffffff; white-space:pre; }
         #question .step .types .item input:checked ~ label { color:#fff; border-color:#3B7302; background-color:#65A603; }
-        
-        .find_wrap { width:100%; padding-top:3.75vw; text-align:center; }
-        .find_wrap #findButton { width:100%; max-width:53.3vw; display:inline-block; padding:0.62vw 0; border-radius:99px; font-size:0.72vw; cursor:pointer; background-color:#ffffff; outline: 0; border: 0; }
-        
-        #result { width:100%; max-width:53.3vw; padding:3.64vw; }
-        #result > div { min-width:233px; border-radius:10px; }
+
+        .find_wrap { width:100%; padding:7.03vw 4.88vw 0; box-sizing:border-box; text-align:center; }
+        .find_wrap #findButton { width:100%; max-width:99.90vw; display:inline-block; padding:1.17vw 0; border-radius:9.67vw; font-size:1.37vw; cursor:pointer; background-color:#ffffff; outline: 0; border: 0; }
+
+        #result { width:100%; max-width:99.90vw; display:flex; gap:2.92vw; flex-wrap: wrap; padding:6.84vw; box-sizing:border-box; }
+        #result > div { width:11.71vw; border-radius:4.79vw; }
+        #result h6 { padding-left:1.53vw; font-size:5.85vw; font-weight:bold; }
         #result > div.type01 { background-color:#3B7302; }
+        #result > div.type01 h6 { color:#F6FCC9; opacity:.8; }
         #result > div.type02 { background-color:#9BBF65; }
+        #result > div.type02 h6 { color:#F6FCC9; opacity:.8; }
         #result > div.type03 { background-color:#65A603; }
+        #result > div.type03 h6 { color:#F6FCC9; opacity:.8; }
         #result > div.type04 { background-color:#F6FCC9; }
+        #result > div.type04 h6 { color:#3B7302; opacity:.8; }
+
+        .swiper { overflow:inherit; }
+        .swiper-slide { width:auto; }
+        @media (max-width: 768px) {
+            #wrap { width:100%; min-height:100vh;}
+            #question { width:100%; max-width:262.31vw; padding-top:12.31vw; }
+            #question .step h3 { font-size:5.13vw; margin:9.74vw 0 3.08vw 5.12vw; }
+            #question .step .types { margin-left:5.12vw; }
+            #question .step .types .item:nth-of-type(n+2) { margin-left:1.28vw; }
+            #question .step .types .item:last-child { margin-right:5.12vw; }
+            #question .step .types .item input ~ label {  padding:3.08vw 7.69vw; border:0.26vw solid #E9F2A7; border-radius:25.38vw; font-size:3.59vw; box-shadow:0 1.03vw 1.03vw rgba(0,0,0,0.05);  }
+
+            .find_wrap { width:100%; padding:18.46vw 5.12vw 0; box-sizing:border-box;;  }
+            .find_wrap #findButton { width:100%; max-width:262.31vw;  padding:3.08vw 0; border-radius:25.38vw; font-size:3.59vw; }
+
+            #result { width:100%; max-width:262.31vw; padding:17.95vw 5.12vw; box-sizing:border-box; }
+            #result > div { width:25.6vw; border-radius:2.56vw; }
+            #result h6 { padding-left:1.53vw; font-size:10.2vw; }
+        }
     </style>
 </head>
 <body>
@@ -36,5 +62,6 @@
         <div id="result"></div>
     </div>
 </body>
+<script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
 <script src="./index.js"></script>
 </html>

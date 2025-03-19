@@ -1,3 +1,4 @@
+
 interface VentilationInner {
     id: number;
     residence: string;
@@ -216,24 +217,31 @@ const question: Question[] = [
     }
 ]
 
+new Swiper('.swiper', {
+    slidesPerView:"auto",
+    loop: false,
+})
+
 const wrap = document.getElementById("question") as HTMLElement;
 
 question.forEach((question: Question, questionIndex) => {
     const step:HTMLDivElement = document.createElement("div");//question 객체 갯수만큼 div 생성
     step.classList.add("step"); //생성된 div에 step class 추가
 
-    step.innerHTML = `<h3>${question.title.value}${question.isEssential ? "<span>*</span>" : "<span></span>"}</h3><div class="types"></div>`;
+    step.innerHTML = `<h3>${question.title.value}${question.isEssential ? "<span>*</span>" : "<span></span>"}</h3><div class="types swiper"><div class="swiper-wrapper"></div></div>`;
     wrap.appendChild(step);
     //h3(title)과 .types 태그까지 생성 끝
     
     const types:NodeListOf<Element> = document.querySelectorAll(".types");
-    
+    const typesSlide = types[questionIndex].querySelector(".swiper-wrapper") as Element;
+
     question.types.forEach((type: QuestionType, typeIndex) => {
         const typeEnglish = type.english;
         const typeKorean = type.korean;
         const typeItem:HTMLDivElement = document.createElement("div");
         typeItem.classList.add("item");
-        
+        typeItem.classList.add("swiper-slide");
+
         
         const stringProperty = (type: string | string[]): string => {
             return (Array.isArray(type) ? type : [type]).join("_");
@@ -253,8 +261,10 @@ question.forEach((question: Question, questionIndex) => {
             //단일 선택일 경우
             typeItem.innerHTML = `<input type="radio" id="${groupProperty}" name="${question.title.key}"/><label for="${groupProperty}">${groupName}</label>`;
         }
-        
-        types[questionIndex].appendChild(typeItem);
+
+        if(typesSlide){
+            typesSlide.appendChild(typeItem);
+        }
     });
 
 });
@@ -371,7 +381,6 @@ findButton.addEventListener("click", function(){
             result.vent.forEach((element, index)=>{
                 const resultText:HTMLDivElement = document.createElement("div");
                 let classNumber = index + 1;
-                console.log(classNumber);
                 if(classNumber % 5 === 0){
                     resultText.classList.add(`type01`);
                 }else if(classNumber % 6 === 0){
@@ -384,7 +393,7 @@ findButton.addEventListener("click", function(){
                     resultText.classList.add(`type${String(classNumber).padStart(2, "0")}`);
                 }
 
-                resultText.innerHTML = `<h6>vent${String(element.id).padStart(2, "0")}</h6>`;
+                resultText.innerHTML = `<h6>${String(element.id).padStart(2, "0")}</h6>`;
                 resultField.appendChild(resultText);
             });
         }else {
