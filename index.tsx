@@ -1,3 +1,4 @@
+declare var Swiper: any;
 
 interface VentilationInner {
     id: number;
@@ -217,10 +218,7 @@ const question: Question[] = [
     }
 ]
 
-new Swiper('.swiper', {
-    slidesPerView:"auto",
-    loop: false,
-})
+const clickSlideArray: typeof Swiper[] = [];
 
 const wrap = document.getElementById("question") as HTMLElement;
 
@@ -234,6 +232,14 @@ question.forEach((question: Question, questionIndex) => {
     
     const types:NodeListOf<Element> = document.querySelectorAll(".types");
     const typesSlide = types[questionIndex].querySelector(".swiper-wrapper") as Element;
+    
+    clickSlideArray.push(
+        new Swiper('.swiper', {
+            slidesPerView:"auto",
+            loop: false,
+        })
+    );
+    
 
     question.types.forEach((type: QuestionType, typeIndex) => {
         const typeEnglish = type.english;
